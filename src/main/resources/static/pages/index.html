@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>好溪防洪调度模拟系统</title>
+
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../iconfont/iconfont.css">
+    <script src="http://api.tianditu.gov.cn/api?v=4.0&tk=057364131c2f3bec4cfd991bbea7a259" type="text/javascript"></script>
+    <script type="text/javascript" src="../js/map.js"></script>
+    <script src="../js/echarts.js"></script>
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/vue.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script src="../js/axios-0.18.0.js"></script>
+</head>
+
+<body onLoad="onLoad()">
+    <div class="flood_control_head">
+        <h1><a href="index.html">好溪防洪调度模拟系统</a></h1>
+    </div>
+    <div class="container">
+        <div class="flood_control_aside ">
+            <ul>
+                <li><span class="iconfont">&#xe818;<a href="index.html">首页</a></span></li>
+                <li><span class="iconfont">&#xe636;<a href="rainStation.html">雨量站</a></span></li>
+                <li><span class="iconfont">&#xe62d;<a href="gateStation.html">闸站</a></span></li>
+            </ul>
+        </div>
+        <div class="flood_control_right" id="app">
+            <div id="map" style="height: 640px;width: 100%;">
+                <div class="chartsBox">
+                    <div id="close" class="closeBox">
+                        <span><a id="closeBtn" href="javascript:void(0);" class="close-login">关闭</a></span>
+                    </div>
+                    <div id="charts"></div>
+                </div>
+                <div class="btn">
+                    <button id="simulation">防洪调度模拟</button>
+                    <button id="download" onclick="downloadEvt('../data/flood_data_plus.7z')">下载洪水数据</button>
+                </div>
+                <div class="simulationBox">
+                    <div class="simulationTitle">
+                        <h3>防洪调度模拟</h3>
+                        <span><a id="simulationClose" href="javascript:void(0);">关闭</a></span>
+                    </div>
+                    <div class="simulationContent">
+                        <div class="top">
+                            <div class="contendDownload" onchange="check();">
+                                <select id="mySelect">
+                                    <option value="201907">2019年7月洪水</option>
+                                    <option value="202006">2020年6月洪水</option>
+                                    <option value="202106">2021年6月洪水</option>
+                                </select>
+                                <button type="button" id="download3h"><span>下载3小时内完整数据</span></button>
+                            </div>
+                            <h2>基本信息</h2>
+                            <div class="baseMessage" id="message">前3小时面降雨量: 101.7542857毫米, 201.5427143毫米, 349.3822222毫米<br> 缙云河道3小时内流量 :13.0456立方米,15.3975立方米, 10.0356立方米</div>
+                        </div>
+                        <div class="middle">
+                            <div class="intercept">
+                                <ul>
+                                    <li><span>预测缙云河道1小时后流量达到: <input type="number" id="forecast" min="0"></span>立方米</li>
+                                    <li><span>壶镇河道&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp; 拦截流量 <input type="number" id="hz" max="30" min="0" oninput="if(value>30)value=30"></span>上限30&nbsp;立方米</li>
+                                    <li><span>东方河道&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp; 拦截流量 <input type="number" id="df" max="30" min="0" oninput="if(value>30)value=30"></span>上限30&nbsp;立方米</li>
+                                    <li><span>仙都河道&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp; 拦截流量 <input type="number" id="xd" max="30" min="0" oninput="if(value>30)value=30"></span>上限30&nbsp;立方米</li>
+                                </ul>
+                            </div>
+                            <div class="sum" style="height: 20px;line-height:20px;"> 已经使用总调度的:<span style="font-weight: 700; font-size: 20px ;margin-left: 5px;" id="overall">0%</span></div>
+                            <button id="smtBtn"><span>模拟调度</span></button>
+                        </div>
+                        <div class="foot">
+                            <p>上述调度方案执行后，1小时后缙云河道减少掉的流量：<span id="reduce">0</span>立方米, 实际流量为</p>
+                            <div class="result">
+                                <p id="real">暂未模拟</p>
+                                <span id="warn">河道流量上限为250立方米</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var mySelect = document.getElementById('mySelect');
+    var message = document.getElementById('message');
+    var index = mySelect.selectedIndex;
+    var download3h = document.getElementById('download3h');
+    var forecast = document.getElementById('forecast');
+    var hz = document.getElementById('hz');
+    var df = document.getElementById('df');
+    var xd = document.getElementById('xd');
+    var overall = document.getElementById('overall');
+    var smtBtn = document.getElementById('smtBtn');
+    var reduce=document.getElementById('reduce');
+    var real=document.getElementById('real');
+    var warn=document.getElementById('warn');
+    forecast.value = 0;
+    hz.value = 0;
+    df.value = 0;
+    xd.value = 0;
+
+    function downloadEvt(url) {
+        window.location.href = url;
+    }
+
+    function check() {
+        if (mySelect.value == '201907') {
+
+            message.innerHTML = '当3小时面降雨量: 101.7542857毫米, 201.5427143毫米, 349.3822222毫米 缙云河道3小时内流量 :13.0456立方米,15.3975立方米, 10.0356立方米';
+        } else if (mySelect.value == '202006') {
+
+            message.innerHTML = '当3小时面降雨量: 265.8423333毫米, 323.4735619毫米, 334.9384984毫米缙云河道3小时内流量 :0.7618立方米,0.9817立方米, 0.9921立方米';
+        } else if (mySelect.value == '202106') {
+
+            message.innerHTML = '当3小时面降雨量: 133.648毫米, 183.0938413毫米, 229.5022222毫米缙云河道3小时内流量 :2.8275立方米,0.1623立方米, 1.7809立方米';
+        }
+    }
+
+
+    function download(filename, text) {
+        var pom = document.createElement("a");
+        pom.setAttribute(
+            "href",
+            "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+        );
+        pom.setAttribute("download", filename);
+        if (document.createEvent) {
+            var event = document.createEvent("MouseEvents");
+            event.initEvent("click", true, true);
+            pom.dispatchEvent(event);
+        } else {
+            pom.click();
+        }
+    }
+
+
+    download3h.addEventListener('click', function() {
+        if (mySelect.value == '201907') {
+            download("201907.txt", "201907");
+        } else if (mySelect.value == '202006') {
+            download("202006.txt", "202006");
+        } else if (mySelect.value == '202106') {
+            download("202106.txt", "202106");
+        }
+    })
+
+
+    hz.addEventListener('input', function() {
+        var num = ((parseFloat(hz.value) + parseFloat(df.value) + parseFloat(xd.value)) / 90) * 100;
+        overall.innerHTML = Number(num.toString().match(/^\d+(?:\.\d{0,2})?/)) + '%';
+    })
+
+    df.addEventListener('input', function() {
+        var num = ((parseFloat(hz.value) + parseFloat(df.value) + parseFloat(xd.value)) / 90) * 100;
+        overall.innerHTML = Number(num.toString().match(/^\d+(?:\.\d{0,2})?/)) + '%';
+    })
+
+    xd.addEventListener('input', function() {
+        var num = ((parseFloat(hz.value) + parseFloat(df.value) + parseFloat(xd.value)) / 90) * 100;
+        overall.innerHTML = Number(num.toString().match(/^\d+(?:\.\d{0,2})?/)) + '%';
+    })
+
+    //模拟调度
+    function judge(a){
+        if (a>250){
+            real.style.color='red';
+            warn.style.color='red';
+            warn.innerText='已经超出了警戒线250立方米';
+        }else {
+            real.style.color='green';
+            warn.style.color='green';
+            warn.innerText='尚未超过上限250立方米';
+        }
+    }
+    smtBtn.addEventListener('click',function () {
+        var resultNum=[];
+        var x1=x2=x3=0;
+        var postInterception=0;
+        var intercept=0;
+        var realNum=0;
+        if (mySelect.value == '201907') {
+            axios.get("/calculation/calculation2019").then((res) => {
+                resultNum = res.data;
+                x1=resultNum[0]-parseFloat(hz.value);
+                x2=resultNum[1]-parseFloat(df.value);
+                x3=resultNum[2]-parseFloat(xd.value);
+                //设置拦截后的流量
+                postInterception=13.65+0.844*x1+0.387*x2+0.069*x3+0.0002*x1*x1+0.00004*x1*x2-0.0004*x1*x3+0.0003*x2*x2-0.0007*x2*x3+0.0005*x3*x3;
+                //拦截掉的流量
+                intercept=parseFloat(forecast.value)-postInterception;
+                //实际的流量
+                realNum=535.57-intercept;
+                judge(realNum);
+                reduce.innerHTML=Number(intercept.toString().match(/^\d+(?:\.\d{0,2})?/));
+                real.innerHTML=Number(realNum.toString().match(/^\d+(?:\.\d{0,2})?/))+'立方米';
+            });
+        } else if (mySelect.value == '202006') {
+            axios.get("/calculation/calculation2020").then((res) => {
+                resultNum = res.data;
+                x1=resultNum[0]-parseFloat(hz.value);
+                x2=resultNum[1]-parseFloat(df.value);
+                x3=resultNum[2]-parseFloat(xd.value);
+                //设置拦截后的流量
+                postInterception=13.65+0.844*x1+0.387*x2+0.069*x3+0.0002*x1*x1+0.00004*x1*x2-0.0004*x1*x3+0.0003*x2*x2-0.0007*x2*x3+0.0005*x3*x3;
+                //拦截掉的流量
+                intercept=parseFloat(forecast.value)-postInterception;
+                //实际的流量
+                realNum=259.48-intercept;
+                judge(realNum);
+                reduce.innerHTML=Number(intercept.toString().match(/^\d+(?:\.\d{0,2})?/));
+                real.innerHTML=Number(realNum.toString().match(/^\d+(?:\.\d{0,2})?/))+'立方米';
+            });
+        } else if (mySelect.value == '202106') {
+            axios.get("/calculation/calculation2021").then((res) => {
+                resultNum = res.data;
+                x1=resultNum[0]-parseFloat(hz.value);
+                x2=resultNum[1]-parseFloat(df.value);
+                x3=resultNum[2]-parseFloat(xd.value);
+                console.log(x1,resultNum[0],parseFloat(hz.value))
+                //设置拦截后的流量
+                postInterception=13.65+0.844*x1+0.387*x2+0.069*x3+0.0002*x1*x1+0.00004*x1*x2-0.0004*x1*x3+0.0003*x2*x2-0.0007*x2*x3+0.0005*x3*x3;
+                //拦截掉的流量
+                intercept=parseFloat(forecast.value)-postInterception;
+                //实际的流量
+                realNum=290.61 -intercept;
+                judge(realNum);
+                reduce.innerHTML=Number(intercept.toString().match(/^\d+(?:\.\d{0,2})?/));
+                real.innerHTML=Number(realNum.toString().match(/^\d+(?:\.\d{0,2})?/))+'立方米';
+            });
+        }
+    })
+</script>
+
+</html>

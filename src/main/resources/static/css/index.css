@@ -1,0 +1,351 @@
+    @import "https://cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css";
+    body {
+        font-family: "Microsoft YaHei";
+    }
+    
+    body,
+    div,
+    ul,
+    li,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    input,
+    p {
+        margin: 0;
+        padding: 0;
+    }
+    
+    a {
+        text-decoration: none;
+        color: black;
+    }
+    
+    ul,
+    li {
+        list-style: none!important;
+    }
+    
+    @font-face {
+        font-family: 'iconfont';
+        src: url('iconfont.ttf?t=1670328580165') format('truetype');
+    }
+
+    button{
+        cursor: pointer;
+        border: 0;
+    }
+
+    button:hover{
+        box-shadow: 0 5px darkgray;
+        opacity: 0.5;
+        transform: translateY(2px);
+    }
+
+    .iconfont {
+        font-family: "iconfont" !important;
+        font-size: 16px;
+        font-style: normal;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .flood_control_head {
+        height: 80px;
+        width: 100%;
+        background-color: dodgerblue;
+        position: relative;
+    }
+    
+    .flood_control_head h1 {
+        line-height: 80px;
+        text-align: center;
+    }
+    
+    .container {
+        position: relative;
+    }
+    
+    .flood_control_aside {
+        position: absolute;
+        background-color: white;
+        width: 12.5%;
+        height: 600px;
+        float: left;
+    }
+    
+    .flood_control_aside ul li {
+        width: 80px;
+        height: 55px;
+        line-height: 55px;
+        margin: 0px auto;
+        font-size: 20px;
+        font-weight: 700;
+    }
+    
+    .flood_control_aside ul li span {
+        font-size: 18px;
+        margin-right: 5px;
+    }
+    
+    .flood_control_aside ul li :hover {
+        color: dodgerblue;
+        transform: translateY(1px);
+    }
+    
+    .flood_control_right {
+        position: relative;
+        top: 0;
+        left: 0;
+        background-color: #ecf0f5;
+        width: 87.5%;
+        height: 600px;
+        float: right;
+    }
+    
+    .chartsBox {
+        display: none;
+        position: fixed;
+        width: 605px;
+        height: 350px;
+        left: 55%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        border: 1px solid darkgray;
+        background-color: white;
+        z-index: 999;
+    }
+    
+    .closeBox {
+        position: relative;
+        float: right;
+        width: 100%;
+        margin: 10px 0px 0px 0px;
+        text-align: center;
+        line-height: 50px;
+        height: 50px;
+        font-size: 18px;
+        cursor: move;
+        z-index: 9999;
+    }
+    
+    .closeBox span {
+        position: absolute;
+        font-size: 12px;
+        right: -20px;
+        top: -30px;
+        background: white;
+        border: #ebebeb solid 1px;
+        width: 40px;
+        height: 45px;
+        border-radius: 20px;
+    }
+    
+    #charts {
+        position: relative;
+        float: left;
+        width: 600px;
+        height: 300px;
+        left: 50%;
+        top: 37%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        z-index: 9999;
+    }
+    
+    .btn {
+        top: 580px;
+        position: relative;
+        height: 50px;
+        width: 100%;
+        line-height: 50px;
+        z-index: 999;
+    }
+    
+    .btn button {
+        width: 120px;
+        height: 30px;
+        line-height: 30px;
+        border: 0;
+        background-color: dodgerblue;
+        color: white;
+        margin: 15px 10px;
+        float: right;
+    }
+    
+    .simulationBox {
+        display: none;
+        position: relative;
+        margin: auto;
+        top: -40px;
+        width: 520px;
+        height: 600px;
+        background-color: #fff;
+        border: 0;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+        text-align: center;
+        z-index: 999;
+    }
+    
+    .simulationTitle {
+        padding: 16px 24px;
+        color: rgba(0, 0, 0, .65);
+        background: #fff;
+        border-bottom: 1px solid #e8e8e8;
+        border-radius: 4px 4px 0 0;
+        font-size: 18px;
+    }
+    
+    .simulationTitle span {
+        position: absolute;
+        font-size: 18px;
+        right: -20px;
+        top: -10px;
+        background: white;
+        border: #ebebeb solid 1px;
+        width: 40px;
+        height: 40px;
+        font-size: 15px;
+        border-radius: 25px;
+        line-height: 45px;
+    }
+
+    .simulationContent {
+        padding: 24px;
+        font-size: 14px;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+    
+    select {
+        background: rgba(0, 0, 0, 0);
+        width: 150px;
+        height: 30px;
+        font-size: 15px;
+        box-sizing: border-box;
+        background-color: #fff;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+    }
+    
+    option {
+        color: black;
+        background: #fff;
+        line-height: 20px;
+    }
+    
+    select:focus {
+        border: 2px #ddd solid;
+        box-shadow: 0 0 15px 1px #DDDDDD;
+    }
+    
+    option:hover {
+        background: #EBCCD1;
+    }
+    
+    .simulationContent button {
+        width: 150px;
+        height: 30px;
+        font-size: 12px;
+        color: #fff;
+        margin-left: 20px;
+        background-color: dodgerblue;
+        border-radius: 5px;
+    }
+    
+    .contendDownload {
+        display: flex;
+        align-items: center;
+        height: 30px;
+        line-height: 30px;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+    
+    .baseMessage {
+        text-align: left;
+        height: 40px;
+    }
+    
+    .top {
+        margin: 0;
+        padding: 5px 0;
+        height: 115px;
+        border-bottom: 1px solid #e8e8e8;
+    }
+    
+    .middle {
+        margin: 0;
+        padding: 5px 0;
+        width: 100%;
+        height: 230px;
+        border-bottom: 1px solid #e8e8e8;
+    }
+    
+    .intercept {
+        height: 150px;
+        padding: 10px;
+        font-size: 15px;
+    }
+    
+    .intercept input {
+        background: rgba(0, 0, 0, 0);
+        width: 90px;
+        height: 30px;
+        margin: 0 8px;
+        text-align: center;
+        font-size: 15px;
+        box-sizing: border-box;
+        background-color: #fff;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+    }
+    
+    .intercept ul li {
+        height: 35px;
+        line-height: 35px;
+        color: red;
+    }
+    
+    .intercept ul li span {
+        color: black;
+    }
+    
+    .middle button {
+        width: 120px;
+        height: 35px;
+        font-size: 15px;
+        color: #fff;
+        margin-top: 5px;
+        border-radius: 5px;
+        background-color: #1890ff;
+    }
+    
+    .foot {
+        margin-top: 5px;
+    }
+    
+    .foot p {
+        text-align: left;
+    }
+    
+    .foot p span {
+        font-size: 18px;
+        color: red;
+    }
+    
+    .result {
+        margin-top: 8px;
+        font-size: 18px;
+    }
+    
+    .result p {
+        text-align: center;
+        font-size: 25px;
+    }
+
